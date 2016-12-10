@@ -4,7 +4,6 @@ open System
 
 open Xunit
 open FsCheck
-open FsCheck.Xunit
 
 open FSharpz.Collections.Mutable
 
