@@ -9,15 +9,15 @@ module Mutable =
         let heap : System.Collections.Generic.List<'T> = System.Collections.Generic.List<'T>(values)
     
         let isGreater x y =
-            if isDescending then x > y else y > x
+            if isDescending then x > y else x < y
 
         let isLower x y = not (isGreater x y)
 
         let mutable size = heap.Count
 
         let parent i = (i - 1) / 2
-        let leftChild i = 2 * i + 1
-        let rightChild i = 2 * i + 2
+        let leftChild i = 2 * i
+        let rightChild i = 2 * i + 1
 
         let swap i maxIndex =
             let temp = heap.[i]
@@ -37,7 +37,7 @@ module Mutable =
             let maxIndex = if r < size && isGreater heap.[r] heap.[maxIndexLeft] then r else maxIndexLeft
             if i <> maxIndex then
                 swap i maxIndex
-                siftUp maxIndex
+                siftDown maxIndex
             else ()
     
         let build (unsortedValues: seq<'T>) =
@@ -49,6 +49,10 @@ module Mutable =
         new (values) = PriorityQueue<'T>(values, true)
 
         member this.IsEmpty = size = 0
+
+        member this.TryGet() =
+            if not this.IsEmpty then Some(heap.[0])
+            else None
 
         member this.Dequeue() =
             if this.IsEmpty then raise (new Exception("No more elements to dequeue"))
@@ -72,9 +76,6 @@ module Tests =
 
     open System
     open Mutable
-    
-    let pMax = new PriorityQueue<int>([|3; 1; 4; 2|])
-    let pMin = new PriorityQueue<int>([|3; 1; 4; 2|], false)
 
     [<CustomComparison; StructuralEquality>]
     type Point = { X: int; 
