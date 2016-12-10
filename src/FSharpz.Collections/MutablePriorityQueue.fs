@@ -71,27 +71,3 @@ module Mutable =
                 heap.[size] <- p
             size <- size + 1
             siftUp (size - 1)
-
-module Tests =
-
-    open System
-    open Mutable
-
-    [<CustomComparison; StructuralEquality>]
-    type Point = { X: int; 
-                   Y: int }
-                    interface IComparable<Point> with
-                        member this.CompareTo other =
-                            compare this.Y other.Y
-                    interface IComparable with
-                        member this.CompareTo(obj: obj) =
-                            match obj with
-                            | :? Point -> compare this.Y (unbox<Point> obj).Y
-                            | _ -> invalidArg "obj" "Must be of type Point"
-                        
-
-    let p1 = {X = 10; Y = 1}
-    let p2 = {X = 1; Y = 10}
-
-    let pointMax = new PriorityQueue<Point>([|p1; p2|])
-    let pointMin = new PriorityQueue<Point>([|p1; p2|], false)
