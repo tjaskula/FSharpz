@@ -47,6 +47,7 @@ module Mutable =
         do build heap
 
         new (values) = PriorityQueue<'T>(values, true)
+        new () = PriorityQueue<'T>([], true)
 
         member this.IsEmpty = size = 0
 

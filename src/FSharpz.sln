@@ -9,6 +9,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{C56200B3
 EndProject
 Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "FSharpz.Collections.Tests", "Tests\FSharpz.Collections.Tests\FSharpz.Collections.Tests.fsproj", "{7246F803-66E1-4FBE-BB1F-834DB176F681}"
 EndProject
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "FSharpz.Collections.PerfTests", "Tests\FSharpz.Collections.PerfTests\FSharpz.Collections.PerfTests.fsproj", "{98179B07-1A6B-4488-83E8-20F89A6430CC}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -23,11 +25,16 @@ Global
 		{7246F803-66E1-4FBE-BB1F-834DB176F681}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7246F803-66E1-4FBE-BB1F-834DB176F681}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7246F803-66E1-4FBE-BB1F-834DB176F681}.Release|Any CPU.Build.0 = Release|Any CPU
+		{98179B07-1A6B-4488-83E8-20F89A6430CC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{98179B07-1A6B-4488-83E8-20F89A6430CC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{98179B07-1A6B-4488-83E8-20F89A6430CC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{98179B07-1A6B-4488-83E8-20F89A6430CC}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{7246F803-66E1-4FBE-BB1F-834DB176F681} = {C56200B3-867C-4088-A06E-0C4608778A31}
+		{98179B07-1A6B-4488-83E8-20F89A6430CC} = {C56200B3-867C-4088-A06E-0C4608778A31}
 	EndGlobalSection
 EndGlobal
