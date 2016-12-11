@@ -13,7 +13,7 @@ let max = pown 10 9
 type PriorityQueue () =
     let mutable list  : int list = []
 
-    [<Params (2000,20000,200000,2000000)>]
+    [<Params (2000, 20000, 200000, 2000000)>]
     member val public Length = 0 with get, set
 
     [<Setup>]
