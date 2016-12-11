@@ -15,6 +15,10 @@ module Mutable =
 
         let mutable size = heap.Count
 
+        let shrinkHeap() =
+            let shouldShrink = size < heap.Count / 2
+            if shouldShrink then heap.RemoveRange(size, heap.Count - size - 1)
+
         let parent i = (i - 1) / 2
         let leftChild i = 2 * i
         let rightChild i = 2 * i + 1
@@ -40,16 +44,18 @@ module Mutable =
                 siftDown maxIndex
             else ()
     
-        let build (unsortedValues: seq<'T>) =
+        let build() =
             for i = size / 2 downto 0 do
                 siftDown i
     
-        do build heap
+        do build()
 
         new (values) = PriorityQueue<'T>(values, true)
         new () = PriorityQueue<'T>([], true)
 
         member this.IsEmpty = size = 0
+
+        member this.Count = size
 
         member this.Dequeue() =
             if this.IsEmpty then raise (new Exception("No more elements to dequeue"))
@@ -58,6 +64,7 @@ module Mutable =
             // we limit the boundary but the last element stays in memory
             // we could use heap.Remove but it's O(n) operation so too slow
             size <- size - 1
+            //shrinkHeap()
             siftDown 0
             result
 

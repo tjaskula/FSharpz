@@ -30,8 +30,7 @@ module MutablePriorityQueueTests =
         let samples = Gen.sample 500 100 intGenerator
         let pMax = new PriorityQueue<int>(samples)
         let dequeued = dequeueAll pMax []
-        let dequeuedDesc xs s = xs = (s |> List.sort)
-        Assert.True(dequeuedDesc dequeued samples)
+        Assert.Equal<int list>(dequeued, (samples |> List.sort))
 
     [<Fact>]
     let ``Should Dequeue in ascending order for Min PriorityQueue``() =
@@ -39,23 +38,33 @@ module MutablePriorityQueueTests =
         let samples = Gen.sample 500 100 intGenerator
         let pMin = new PriorityQueue<int>(samples, false)
         let dequeued = dequeueAll pMin []
-        let dequeuedAsc xs s = xs = (s |> List.sortBy (fun x -> -x))
-        Assert.True(dequeuedAsc dequeued samples)
+        Assert.Equal<int list>(dequeued, (samples |> List.sortBy (fun x -> -x)))
 
     [<Fact>]
     let ``Should Dequeue in descending order for Max PriorityQueue and custom type``() = 
         let pointGenerator = Arb.generate<Point>
         let samples = Gen.sample 500 100 pointGenerator
+        let samplesSorted = samples |> List.sort
         let pMax = new PriorityQueue<Point>(samples)
         let dequeued = dequeueAll pMax []
-        let dequeuedDesc xs s = xs = (s |> List.sort)
-        Assert.True(dequeuedDesc dequeued samples)
+        for i in 0..dequeued.Length - 1 do
+            Assert.Equal(dequeued.[i].Y, samplesSorted.[i].Y)
 
     [<Fact>]
     let ``Should Dequeue in ascending order for Min PriorityQueue and custom type``() =
         let pointGenerator = Arb.generate<Point>
         let samples = Gen.sample 500 100 pointGenerator
-        let pMin = new PriorityQueue<Point>(samples, false)
+        let samplesSorted = samples |> List.sortBy (fun p -> -p.Y)
+        let pMin = PriorityQueue<Point>(samples, false)
         let dequeued = dequeueAll pMin []
-        let dequeuedAsc xs s = xs = (s |> List.sortBy (fun p -> -p.Y))
-        Assert.True(dequeuedAsc dequeued samples)
+        for i in 0..dequeued.Length - 1 do
+            Assert.Equal(dequeued.[i].Y, samplesSorted.[i].Y)
+
+    [<Fact>]
+    let ``Should shrink the heap when needed``() = 
+        let intGenerator = Arb.generate<int>
+        let samples = Gen.sample 500 100 intGenerator
+        let pMax = PriorityQueue<int>(samples)
+        for i in 0..50 do
+            pMax.Dequeue() |> ignore
+        Assert.Equal(49, pMax.Count)
