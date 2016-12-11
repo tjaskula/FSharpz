@@ -64,7 +64,7 @@ module Mutable =
             // we limit the boundary but the last element stays in memory
             // we could use heap.Remove but it's O(n) operation so too slow
             size <- size - 1
-            //shrinkHeap()
+            shrinkHeap()
             siftDown 0
             result
 
