@@ -51,10 +51,6 @@ module Mutable =
 
         member this.IsEmpty = size = 0
 
-        member this.TryGet() =
-            if not this.IsEmpty then Some(heap.[0])
-            else None
-
         member this.Dequeue() =
             if this.IsEmpty then raise (new Exception("No more elements to dequeue"))
             let result = heap.[0]
