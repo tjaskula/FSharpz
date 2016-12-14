@@ -26,7 +26,7 @@ type PriorityQueue () =
     [<Benchmark>]
     member self.MaxPriorityQueueInsertingFromStart () = 
         let pq = PriorityQueue<int>()
-        list |> List.iter (fun e -> pq.Enqueue e)
+        list |> List.iter pq.Enqueue
 
     [<Benchmark>]
     member self.FSharpxPriorityQueueInsertingFromStart () = 
