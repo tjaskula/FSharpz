@@ -20,8 +20,8 @@ module Mutable =
             if shouldShrink then heap.RemoveRange(size, heap.Count - size - 1)
 
         let parent i = (i - 1) / 2
-        let leftChild i = 2 * i
-        let rightChild i = 2 * i + 1
+        let leftChild i = 2 * i + 1
+        let rightChild i = 2 * i + 2
 
         let swap i maxIndex =
             let temp = heap.[i]
@@ -43,6 +43,20 @@ module Mutable =
                 swap i maxIndex
                 siftDown maxIndex
             else ()
+
+        let rec preOrderTraversal predicate indx =
+            if indx >= size then
+                None
+            else
+                let elem = heap.[indx]
+                if predicate(elem) then
+                    Some(indx)
+                else
+                    let leftChildIndx = leftChild indx
+                    let rightChildIndex = rightChild indx
+                    match preOrderTraversal predicate leftChildIndx with
+                    | None -> preOrderTraversal predicate rightChildIndex
+                    | found -> found 
     
         let build() =
             for i = size / 2 downto 0 do
@@ -75,3 +89,6 @@ module Mutable =
                 heap.[size] <- p
             size <- size + 1
             siftUp (size - 1)
+
+        member this.Traversal(predicate: 'T -> bool) =
+            preOrderTraversal predicate 0
