@@ -82,7 +82,7 @@ module Mutable =
             siftDown 0
             result
 
-        member this.Enqueue(p: 'T) =
+        member this.Enqueue p =
             if heap.Count = size then
                 heap.Add(p)
             else
@@ -90,5 +90,16 @@ module Mutable =
             size <- size + 1
             siftUp (size - 1)
 
-        member this.Traversal(predicate: 'T -> bool) =
-            preOrderTraversal predicate 0
+        member this.TryFind predicate =
+            match preOrderTraversal predicate 0 with
+            | None -> None
+            | Some(i) -> Some(i, heap.[i])
+
+        member this.Update indx v =
+            if indx < 0 || indx >= size then failwith "The index is out of range"
+            else
+                let old = heap.[indx]
+                heap.[indx] <- v
+                if v > old then
+                    siftUp(indx)
+                else siftDown(indx)

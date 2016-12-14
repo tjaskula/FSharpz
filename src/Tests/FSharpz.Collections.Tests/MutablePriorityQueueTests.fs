@@ -70,10 +70,20 @@ module MutablePriorityQueueTests =
         Assert.Equal(49, pMax.Count)
 
     [<Fact>]
-    let ``Traverse``() = 
+    let ``Should find value with it's index``() = 
         let pq = PriorityQueue<int>([1; 8; 10; 7; 5; 6; 2; 3; 4; 9])
-        Assert.Equal(None, pq.Traversal (fun e -> e = 0))
-        Assert.Equal(Some(5), pq.Traversal (fun e -> e = 1))
-        Assert.Equal(Some(9), pq.Traversal (fun e -> e = 5))
-        Assert.Equal(Some(1), pq.Traversal (fun e -> e = 9))
-        Assert.Equal(Some(0), pq.Traversal (fun e -> e = 10))
+        Assert.Equal(None, pq.TryFind (fun e -> e = 0))
+        Assert.Equal(Some(5, 1), pq.TryFind (fun e -> e = 1))
+        Assert.Equal(Some(9, 5), pq.TryFind (fun e -> e = 5))
+        Assert.Equal(Some(1, 9), pq.TryFind (fun e -> e = 9))
+        Assert.Equal(Some(0, 10), pq.TryFind (fun e -> e = 10))
+
+    [<Fact>]
+    let ``Should update value``() = 
+        let pq = PriorityQueue<int>([1; 8; 10; 7; 5; 6; 2; 3; 4; 9])
+        let indx, _ = (pq.TryFind (fun e -> e = 5)).Value
+        pq.Update indx 11
+        Assert.Equal(Some(0, 11), pq.TryFind (fun e -> e = 11))
+        let indx, _ = (pq.TryFind (fun e -> e = 11)).Value
+        pq.Update indx 0
+        Assert.Equal(Some(9, 0), pq.TryFind (fun e -> e = 0))
