@@ -100,6 +100,6 @@ module Mutable =
             else
                 let old = heap.[indx]
                 heap.[indx] <- v
-                if v > old then
+                if isGreater v old then
                     siftUp(indx)
                 else siftDown(indx)
