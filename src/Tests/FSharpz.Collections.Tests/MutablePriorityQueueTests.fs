@@ -12,7 +12,7 @@ module MutablePriorityQueueTests =
     type Edge = { DestinationVertexId: int; Distance: double }
 
     [<CustomComparison; StructuralEquality>]
-    type Vertex = { Id: int; ShortestDistance: double; Edges: Edge list }
+    type Vertex = { Id: int; ShortestDistance: double; Edges: Edge list; Path: int list }
                     interface IComparable<Vertex> with
                             member this.CompareTo other =
                                 compare this.ShortestDistance other.ShortestDistance
@@ -135,24 +135,69 @@ module MutablePriorityQueueTests =
             { Id = vertexId;
               ShortestDistance = Double.PositiveInfinity;
               Edges = edges |> List.map makeEdge
+              Path = []
             }
 
-        let graph = rawGraph
-                    |> Map.map makeVertex
-                    |> Map.fold (fun (graph: Graph) _ v -> graph.AddVertex(v)) { Vertices = [] }
-                    |> setSource 1
+        let shortestPath (graph: Graph) destinationId =
 
-        let pq = PriorityQueue<Vertex>(graph.GetVertices(), false)
+            let pq = PriorityQueue<Vertex>(graph.GetVertices(), false)
+            let mutable dest = Option<Vertex>.None
 
-        while not pq.IsEmpty do
-            let vertex = pq.Dequeue()
-            for edge in vertex.Edges do
-                let destinationId = edge.DestinationVertexId
-                match pq.TryFind (fun e -> e.Id = destinationId) with
-                | None -> ()
-                | Some(indx, destination) ->
-                    let newDistance = edge.Distance + vertex.ShortestDistance
-                    if newDistance < destination.ShortestDistance then
-                        let newDestination = { destination with ShortestDistance = newDistance }
-                        pq.Update indx newDestination
-                    else ()
+            while not pq.IsEmpty do
+                let vertex = pq.Dequeue()
+                if vertex.Id = destinationId then
+                    dest <- Some(vertex)
+
+                //printfn "Vertex '%i' accessed from : %s" vertex.Id (vertex.Path |> List.rev |> List.fold (fun state elem -> state + ", " + elem.ToString()) "")
+                for edge in vertex.Edges do
+                    let destinationId = edge.DestinationVertexId
+                    match pq.TryFind (fun e -> e.Id = destinationId) with
+                    | None -> ()
+                    | Some(indx, destination) ->
+                        let newDistance = edge.Distance + vertex.ShortestDistance
+                        if newDistance < destination.ShortestDistance then
+                            let newDestination = { destination with ShortestDistance = newDistance; Path = destination.Id :: vertex.Path }
+                            pq.Update indx newDestination
+                        else ()
+
+        Environment.CurrentDirectory <- __SOURCE_DIRECTORY__
+
+        let readLines filePath = System.IO.File.ReadLines(filePath)
+
+        let lines = readLines "CARoadDistances.txt"
+
+        let graphMap =
+            lines
+            |> Seq.map (fun l -> let a = l.Split()
+                                 (int a.[1], int a.[2], float a.[3]))
+            |> Seq.groupBy (fun (f, t, d) -> f)
+            |> Seq.map (fun (key, values) -> (key, values |> Seq.map (fun (k, v, z) -> z, v) |> Seq.toList))
+            |> Map.ofSeq
+
+        let roadNetwork = graphMap
+                            |> Map.map makeVertex
+                            |> Map.fold (fun (graph: Graph) _ v -> graph.AddVertex(v)) { Vertices = [] }
+                            |> setSource 12615
+
+        let arrival = shortestPath roadNetwork 8419
+        ()
+
+//        let graph = rawGraph
+//                    |> Map.map makeVertex
+//                    |> Map.fold (fun (graph: Graph) _ v -> graph.AddVertex(v)) { Vertices = [] }
+//                    |> setSource 1
+//
+//        let pq = PriorityQueue<Vertex>(graph.GetVertices(), false)
+//
+//        while not pq.IsEmpty do
+//            let vertex = pq.Dequeue()
+//            for edge in vertex.Edges do
+//                let destinationId = edge.DestinationVertexId
+//                match pq.TryFind (fun e -> e.Id = destinationId) with
+//                | None -> ()
+//                | Some(indx, destination) ->
+//                    let newDistance = edge.Distance + vertex.ShortestDistance
+//                    if newDistance < destination.ShortestDistance then
+//                        let newDestination = { destination with ShortestDistance = newDistance }
+//                        pq.Update indx newDestination
+//                    else ()
