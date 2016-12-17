@@ -1,6 +1,7 @@
 ﻿namespace FSharpz.Collections.Tests
 
 open System
+open System.Collections.Generic
 
 open Xunit
 open FsCheck
@@ -138,33 +139,38 @@ module MutablePriorityQueueTests =
               Path = []
             }
 
-        let shortestPath (graph: Graph) destinationId =
+        let shortestPath (graph: Dictionary<int, Vertex>) destinationId =
 
-            let pq = PriorityQueue<Vertex>(graph.GetVertices(), false)
+            let pq = PriorityQueue<Vertex>(graph.Values, false)
             let mutable dest = Option<Vertex>.None
+            let visited = Dictionary<int, Vertex>()
 
             while not pq.IsEmpty do
                 let vertex = pq.Dequeue()
-                if vertex.Id = destinationId then
-                    dest <- Some(vertex)
+                if vertex.ShortestDistance <> Double.PositiveInfinity && not (visited.ContainsKey(vertex.Id)) then
+                    if vertex.Id = destinationId then
+                        dest <- Some(vertex)
 
-                //printfn "Vertex '%i' accessed from : %s" vertex.Id (vertex.Path |> List.rev |> List.fold (fun state elem -> state + ", " + elem.ToString()) "")
-                for edge in vertex.Edges do
-                    let destinationId = edge.DestinationVertexId
-                    match pq.TryFind (fun e -> e.Id = destinationId) with
-                    | None -> ()
-                    | Some(indx, destination) ->
-                        let newDistance = edge.Distance + vertex.ShortestDistance
-                        if newDistance < destination.ShortestDistance then
-                            let newDestination = { destination with ShortestDistance = newDistance; Path = destination.Id :: vertex.Path }
-                            pq.Update indx newDestination
+                    //printfn "Vertex '%i' accessed from : %s" vertex.Id (vertex.Path |> List.rev |> List.fold (fun state elem -> state + ", " + elem.ToString()) "")
+                    for edge in vertex.Edges do
+                        let destinationId = edge.DestinationVertexId
+                        if not (visited.ContainsKey(destinationId)) then
+                            let newDistance = edge.Distance + vertex.ShortestDistance
+                            let destination = graph.[destinationId]
+                            if newDistance < destination.ShortestDistance then
+                                let newDestination = { destination with ShortestDistance = newDistance; Path = destination.Id :: vertex.Path }
+                                pq.Enqueue newDestination
+                                graph.[destinationId] <- newDestination
+                            else ()
                         else ()
+                    visited.Add(vertex.Id, vertex)
+            dest
 
         Environment.CurrentDirectory <- __SOURCE_DIRECTORY__
 
         let readLines filePath = System.IO.File.ReadLines(filePath)
 
-        let lines = readLines "CARoadDistances.txt"
+        let lines = readLines "USA-road-d.CAL.gr"
 
         let graphMap =
             lines
@@ -176,10 +182,12 @@ module MutablePriorityQueueTests =
 
         let roadNetwork = graphMap
                             |> Map.map makeVertex
-                            |> Map.fold (fun (graph: Graph) _ v -> graph.AddVertex(v)) { Vertices = [] }
-                            |> setSource 12615
+                            |> Map.fold (fun (graph: Dictionary<int, Vertex>) _ v -> graph.Add(v.Id, v); graph) (Dictionary<int, Vertex>())
+                            //|> setSource 1215934
+        let start = roadNetwork.[1215934]
+        roadNetwork.[1215934] <- {start with ShortestDistance = 0.0 }
 
-        let arrival = shortestPath roadNetwork 8419
+        let arrival = shortestPath roadNetwork 1598609
         ()
 
 //        let graph = rawGraph
